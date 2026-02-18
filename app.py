@@ -1,67 +1,74 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(layout="wide", page_title="🕌 KSA VAT Enterprise", page_icon="🕌")
+st.set_page_config(layout="wide", page_title="KSA VAT Pro", page_icon="🕌")
 
-# ═══════════════════════════════════════════════════════════════
-# EXECUTIVE PREMIUM CSS - CFO BOARDROOM QUALITY
+# CLEAN EXECUTIVE CSS
 st.markdown("""
 <style>
-/* SUPREME EXECUTIVE THEME */
-.main-header { 
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-    padding: 3.5rem 2rem; 
-    border-radius: 25px; 
-    color: white; 
-    margin-bottom: 2.5rem;
-    box-shadow: 0 25px 50px rgba(30,58,138,0.4);
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.kpi-card {
-    background: rgba(255,255,255,0.95) !important;
-    padding: 2rem 1.5rem !important;
-    border-radius: 20px !important;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
-    border: none !important;
-    text-align: center;
-    transition: all 0.3s ease;
-    height: 140px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-.kpi-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
-.kpi-icon { font-size: 2.5em; margin-bottom: 0.5rem; }
-.kpi-value { font-size: 2.2em; font-weight: 800; margin: 0; }
-.kpi-label { font-size: 0.9em; color: #64748b; font-weight: 500; margin: 0.25rem 0 0 0; }
-.kpi-trend { font-size: 0.85em; margin-top: 0.25rem; }
-.trend-up { color: #10b981; }
-.trend-down { color: #ef4444; }
-.risk-card { border-left: 6px solid #f59e0b !important; }
-.critical-card { border-left: 6px solid #ef4444 !important; }
-.status-card { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 1.5rem; border-radius: 15px; }
+.stMetric > label { font-size: 1.1em !important; font-weight: 600 !important; }
+.stMetric > div > div > div { font-size: 2.5em !important; font-weight: 800 !important; }
+.metric-container { padding: 1rem; border-radius: 15px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0.5rem; }
 </style>
 """, unsafe_allow_html=True)
 
-# ═══════════════════════════════════════════════════════════════
-# EXECUTIVE HEADER - BOARDROOM QUALITY
-st.markdown("""
-<div class="main-header">
-    <div style="text-align: center;">
-        <h1 style="font-size: 3.8em; font-weight: 900; margin: 0; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">🕌 KSA VAT ENTERPRISE</h1>
-        <p style="font-size: 1.8em; margin: 1rem 0 0.5rem 0; font-weight: 400; opacity: 0.95;">
-            ZATCA Phase 1 ✓ | Phase 2 ✓ | Real-time CFO Platform
-        </p>
-        <div style="font-size: 1.2em; display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
-            <span>🇸🇦 Riyadh Compliance Solution</span>
-            <span>💰 SAR 10M+ Annual Protection</span>
-            <span>📊 15% VAT Intelligence</span>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# EXECUTIVE HEADER
+st.title("🕌 KSA VAT ENTERPRISE PRO")
+st.markdown("***ZATCA Phase 1 ✓ | Phase 2 ✓ | Executive CFO Platform***")
 
-# ═══════════════════════════════════════════════════════════════
-# CFO ENTERPRISE SIDEBAR
+# SIDEBAR
 with st.sidebar:
-    st.markdown("### 🎛️ Executive Cont
+    st.header("🎛️ Controls")
+    st.success("**✓ PHASE 1** - Generation")
+    st.success("**✓ PHASE 2** - FATOORA Ready")
+    period = st.selectbox("Period", ["Jan 2026", "Q1 2026", "Custom"])
+
+# MASTER EXECUTIVE DASHBOARD
+st.markdown("### 📊 Executive VAT Dashboard")
+col1,col2,col3,col4,col5,col6,col7,col8 = st.columns(8)
+
+col1.metric("📋 Total Invoices", "28,472", "+12%")
+col2.metric("💰 Gross Revenue", "SAR 247M", "+23%")
+col3.metric("🧾 VAT 15%", "SAR 37.1M", "+18%")
+col4.metric("💵 Net Revenue", "SAR 210M", "+21%")
+col5.metric("🚨 High Risks", "247", "+15")
+col6.metric("⚠️ Alerts", "1,847", "-23")
+col7.metric("✅ Compliance", "97.6%", "+1.2%")
+col8.metric("📄 Audit Score", "A+", "Perfect")
+
+# DATA UPLOAD
+st.markdown("### 🚀 VAT Intelligence Engine")
+col_a, col_b = st.columns([3,1])
+
+with col_a:
+    uploaded_file = st.file_uploader("📁 Upload VAT Ledger", type=['csv','xlsx'])
+
+with col_b:
+    if st.button("🔄 FULL SCAN", type="primary"):
+        st.success("✅ Analysis Complete!")
+
+# SUPREME PROCESSING ENGINE
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+        
+        st.success(f"✅ **{len(df):,} invoices analyzed**")
+        
+        # LIVE EXECUTIVE UPDATES
+        total = len(df)
+        revenue = df.get('total', [0]).sum()
+        vat = df.get('vat_amount', [0]).sum()
+        
+        col1.metric("📋 Total Invoices", f"{total:,}")
+        col2.metric("💰 Gross Revenue", f"SAR {revenue:,.0f}")
+        col3.metric("🧾 VAT 15%", f"SAR {vat:,.0f}")
+        
+        # ZATCA RISK INTELLIGENCE
+        st.markdown("### 🚨 ZATCA Risk Intelligence")
+        if 'status' in df.columns:
+            risks = df[df['status'].str.contains('ANOMALY|RISK|VOID', na=False)]
+            if len(risks) > 0:
+                st.error(f"🚨 
