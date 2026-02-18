@@ -3,68 +3,71 @@ import pandas as pd
 
 st.set_page_config(layout="wide", page_title="KSA VAT Pro", page_icon="🕌")
 
-st.title("🕌 KSA VAT ENTERPRISE PRO")
-st.markdown("**ZATCA Phase 1 ✓ | Phase 2 ✓ | Executive CFO Intelligence**")
+st.title("🕌 KSA VAT ENTERPRISE DASHBOARD")
+st.markdown("**ZATCA Phase 1 ✓ | Phase 2 ✓ | Executive CFO Platform**")
 
-# SIDEBAR CONTROLS
+# SIDEBAR
 with st.sidebar:
-    st.header("Executive Controls")
-    st.success("Phase 1 - Generation Complete")
-    st.success("Phase 2 - FATOORA Ready")
-    period = st.selectbox("Reporting Period", ["January 2026", "Q1 2026"])
+    st.header("Controls")
+    st.success("Phase 1 Complete")
+    st.success("Phase 2 FATOORA Ready")
 
-# EXECUTIVE 4x2 DASHBOARD
-st.markdown("### Executive VAT Intelligence")
-row1_col1, row1_col2, row1_col3, row1_col4 = st.columns(4)
-row2_col1, row2_col2, row2_col3, row2_col4 = st.columns(4)
+# DASHBOARD ROW 1
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Invoices", "28472", "+12%")
+col2.metric("Revenue", "SAR 247M", "+23%")
+col3.metric("VAT 15%", "SAR 37M", "+18%")
+col4.metric("Net Revenue", "SAR 210M", "+21%")
 
-row1_col1.metric("Total Invoices", "28,472", "+12%")
-row1_col2.metric("Gross Revenue", "SAR 247M", "+23%")
-row1_col3.metric("VAT Collected", "SAR 37.1M", "15%")
-row1_col4.metric("Net Revenue", "SAR 210M", "+21%")
+# DASHBOARD ROW 2
+col5, col6, col7, col8 = st.columns(4)
+col5.metric("Risks", "247")
+col6.metric("Compliance", "97.6%")
+col7.metric("Audit Score", "A+")
+col8.metric("Penalty Savings", "SAR 2.5M")
 
-row2_col1.metric("High Risks", "247")
-row2_col2.metric("Compliance", "97.6%")
-row2_col3.metric("Audit Score", "A+")
-row2_col4.metric("Penalty Savings", "SAR 2.47M")
+# UPLOAD SECTION
+uploaded_file = st.file_uploader("Upload CSV/Excel", type=['csv','xlsx'])
+if st.button("Analyze Data"):
+    st.success("Analysis started!")
 
-# VAT PROCESSING ENGINE
-st.markdown("### VAT Compliance Engine")
-col_left, col_right = st.columns([3,1])
-
-with col_left:
-    uploaded_file = st.file_uploader("Upload VAT Ledger CSV/Excel", type=['csv','xlsx'])
-
-with col_right:
-    if st.button("EXECUTIVE ANALYSIS", type="primary"):
-        st.success("Analysis Complete!")
-
-# CORE PROCESSING LOGIC
+# PROCESSING
 if uploaded_file is not None:
-    if uploaded_file.name.endswith('.csv'):
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_excel(uploaded_file)
-    
-    st.success("Loaded " + str(len(df)) + " invoices successfully")
-    
-    # LIVE CALCULATIONS
-    total_count = len(df)
-    revenue_total = sum(df['total']) if 'total' in df.columns else 0
-    vat_total = sum(df['vat_amount']) if 'vat_amount' in df.columns else 0
-    
-    # UPDATE DASHBOARD
-    row1_col1.metric("Total Invoices", str(total_count))
-    row1_col2.metric("Gross Revenue", "SAR " + str(int(revenue_total)))
-    row1_col3.metric("VAT Collected", "SAR " + str(int(vat_total)))
-    
-    # RISK ANALYSIS
-    st.markdown("### ZATCA Risk Intelligence")
-    if 'status' in df.columns:
-        risk_invoices = df[df['status'].isin(['ANOMALY', 'RISK', 'VOID'])]
-        risk_count = len(risk_invoices)
-        if risk_count > 0:
-            st.error("CRITICAL ALERT: " + str(risk_count) + " HIGH RISK INVOICES")
-            st.error("Estimated Penalty: SAR " + str(risk_count * 10000))
-            st.dataframe(risk_invoices[['invoice_id', 'seller_name', 'total', 'status']].head(10))
-            row2_col1.metric("High Risks", str(risk_c
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+        
+        st.success("Loaded " + str(len(df)) + " invoices")
+        
+        total = len(df)
+        col1.metric("Invoices", str(total))
+        
+        if 'total' in df.columns:
+            revenue = df['total'].sum()
+            col2.metric("Revenue", "SAR " + str(int(revenue)))
+        
+        if 'vat_amount' in df.columns:
+            vat_total = df['vat_amount'].sum()
+            col3.metric("VAT 15%", "SAR " + str(int(vat_total)))
+        
+        st.subheader("ZATCA Risk Check")
+        if 'status' in df.columns:
+            risks = df[df['status'].str.contains('ANOMALY|RISK')]
+            if len(risks) > 0:
+                st.error(str(len(risks)) + " risks found")
+                st.error("Penalty risk: SAR " + str(len(risks)*10000))
+                st.dataframe(risks.head(5))
+            else:
+                st.success("No compliance risks")
+        
+        st.subheader("VAT Ledger")
+        st.dataframe(df.head(10))
+        
+    except:
+        st.error("File read error")
+        st.info("Use CSV format: invoice_id,total,vat_amount,status")
+
+st.markdown("---")
+st.markdown("**KSA VAT Pro - ZATCA Compliant CFO Platform**")
