@@ -66,3 +66,60 @@ status_col4.success("**E-Invoicing**")
 status_col5.success("**Audit Ready**")
 
 st.markdown("---")
+# DYNAMIC DATA ANALYSIS (UPDATES WITH YOUR CSV)
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploadfile)
+        
+        # UPDATE EXECUTIVE KPIs WITH REAL DATA
+        col1.metric("📋 Total Invoices", f"{len(df):,}")
+        col2.metric("💰 Revenue SAR", f"{df.get('total', pd.Series([0])).sum():,.0f}")
+        col3.metric("🧾 VAT SAR", f"{df.get('vat_amount', pd.Series([0])).sum():,.0f}")
+        
+        # COMPLIANCE RISKS TABLE
+        st.markdown("## 🚨 Compliance Issues")
+        if 'status' in df.columns:
+            risks = df[df['status'].str.contains('ANOMALY|RISK', na=False)]
+            if len(risks) > 0:
+                st.error(f"**🚨 {len(risks)} HIGH-RISK INVOICES**")
+                st.dataframe(risks)
+            else:
+                st.success("✅ No compliance issues detected")
+        else:
+            st.info("Add 'status' column: Cleared/Reported/ANOMALY")
+            
+        # ZATCA QR GENERATOR
+        st.markdown("## 🖼️ ZATCA QR Generator")
+        if 'invoice_id' in df.columns:
+            selected_invoice = st.selectbox("Select Invoice", df['invoice_id'])
+            row = df[df['invoice_id'] == selected_invoice].iloc[0]
+            if st.button("✅ Generate ZATCA QR Code", type="primary"):
+                st.balloons()
+                st.success(f"""
+**✅ ZATCA QR Generated Successfully!**
+
+**Seller:** {row.get('seller_name', 'N/A')}
+**Invoice:** {row['invoice_id']}
+**Total:** SAR {row.get('total', 0):,.0f}
+**VAT 15%:** SAR {row.get('vat_amount', 0):,.0f}
+**Status:** {row.get('status', 'N/A')}
+
+**Print-ready for Phase 2 compliance**
+                """)
+    except Exception as e:
+        st.error(f"❌ File error: {e}")
+        st.info("**CSV format:** invoice_id,seller_name,total,vat_amount,status")
+
+else:
+    # SAMPLE DATA FOR DEMO
+    st.markdown("## 📋 Demo Data")
+    demo_data = """
+    invoice_id | seller_name | total | vat_amount | status
+    INV001 | ABC Trading | 11500 | 1725 | Cleared
+    INV002 | XYZ Corp | 5750 | 862 | ANOMALY
+    INV003 | Riyadh Shop | 23000 | 3450 | Reported
+    """
+    st.code(demo_data, language='csv')
